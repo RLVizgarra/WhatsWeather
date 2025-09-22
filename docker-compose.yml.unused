@@ -1,0 +1,27 @@
+services:
+  # The Python application service
+  whatsweather:
+    build: .
+    ports:
+      - "5000:5000" # Maps port 5000 on your machine to port 5000 in the container
+    # Expose the port to other services within the Docker network
+    expose:
+      - "5000"
+    volumes:
+      - ./app:/app # Mounts your local directory to the container for live code changes (optional for dev)
+    environment:
+      - WHATSAPP_ACCESS_TOKEN=${WHATSAPP_ACCESS_TOKEN}
+      - WHATSAPP_TO_PHONE_NUMBER=${WHATSAPP_TO_PHONE_NUMBER}
+    command: python main.py
+
+  # The localxpose service
+#  localxpose:
+#    image: localxpose/localxpose:latest
+#    container_name: localxpose
+#    depends_on:
+#      - whatsapp-app # Ensures the Python app starts before localxpose
+#    # This is crucial: it needs to connect to the host network
+#    network_mode: host
+#    environment:
+#      - ACCESS_TOKEN=${LOCALXPOSE_ACCESS_TOKEN} # Get this from your localxpose dashboard
+#    command: tunnel http --to 127.0.0.1:5000
