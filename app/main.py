@@ -52,7 +52,7 @@ def fetch_weather_data(latitude: float, longitude: float) -> dict:
         "latitude": latitude,
         "longitude": longitude,
         "forecast_days": 1,
-        "forecast_hours": 6,
+        "forecast_hours": 7,
         "hourly": "weather_code,cloud_cover,apparent_temperature,precipitation_probability,uv_index",
         "daily": "weather_code,cloud_cover_mean",
         "timezone": "auto",
@@ -80,6 +80,7 @@ def convert_weather_data(weather_data: dict) -> dict:
     }
 
     for i, time in enumerate(weather_data["hourly"]["time"]):
+        if i == 0: continue  # Skip the current hour, so the forecast is for the next 6 hours
         weather[time] = {
             "weather_code": weather_data["hourly"]["weather_code"][i],
             "cloud_cover": weather_data["hourly"]["cloud_cover"][i],
