@@ -1,2 +1,2 @@
 #!/bin/bash
-docker run --env-file .env whatsweather:latest
+docker run --env-file .env kawcat/whatsweather:latest
