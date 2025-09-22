@@ -13,8 +13,10 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY app/ .
 
-# Expose port (change if your app uses a different port)
-EXPOSE 5000
+# Set environment variables (these can also be set via a .env file)
+ENV WHATSAPP_ACCESS_TOKEN=${WHATSAPP_ACCESS_TOKEN}
+ENV WHATSAPP_PHONE_NUMBER_ID=${WHATSAPP_PHONE_NUMBER_ID}
+ENV WHATSAPP_TO_PHONE_NUMBER=${WHATSAPP_TO_PHONE_NUMBER}
 
 # Run the application (replace with your actual entrypoint)
 CMD ["python", "main.py"]
