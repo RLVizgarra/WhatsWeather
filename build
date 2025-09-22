@@ -1,2 +1,2 @@
 #!/bin/bash
-docker build -t whatsweather:latest .
+docker build -t kawcat/whatsweather:latest .
