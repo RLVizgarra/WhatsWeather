@@ -203,7 +203,7 @@ def get_hour_from_unix(unix_time: int, utc_offset: int = 0) -> int:
 def generate_weather_graph(weather: dict, location: str) -> str:
     print("Generating weather graph...")
 
-    filename = f"weather_forecast_{location}.png"
+    filename = f"{datetime.now().strftime('%Y-%m-%d')}_{location.replace(' ', '_')}_forecast.png"
     hours = []
     temperatures = []
     cloud_covers = []
@@ -252,7 +252,8 @@ def generate_weather_graph(weather: dict, location: str) -> str:
     plt.ylim(0)
     plt.grid(True)
 
-    plt.suptitle(f"Weather Forecast in {location}", fontsize=16)
+    plt.suptitle(f"Weather Forecast for {location}", fontsize=16)
+    plt.figtext(0.5, 0.02, f"{datetime.now().strftime('%d/%b/%Y')} | Open-Meteo", ha="center", fontsize=10, color="gray")
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
     plt.savefig(filename, dpi=300)
     plt.close()
@@ -265,7 +266,8 @@ def format_weather_message(weather: dict, location: str) -> str:
     todays_emoji = convert_wmo_to_emoji(weather["daily"]["weather_code"])
     if todays_emoji is None: todays_emoji = convert_cloud_cover_to_emoji(weather["daily"]["cloud_cover"])
 
-    message = f"{todays_emoji} *Weather Forecast in {location}*\n"
+    message = f"{todays_emoji} *Weather Forecast for {location}*\n"
+    message += f"```{datetime.now().strftime('%d/%b/%Y')}```\n"
     message += "~------------------------------~\n"
     message += "Next 6-hour forecast:\n"
     for time, details in weather.items():
