@@ -43,6 +43,31 @@ def send_whatsapp_message(message: str) -> None:
     if response.status_code != 200:
         raise ValueError(f"Failed to send message: {response.status_code}, {response.text}")
 
+# Fetch coordinates from Open-Meteo API
+def fetch_coordinates(location: str) -> tuple[float, float]:
+    print("Fetching coordinates...")
+
+    url = "https://geocoding-api.open-meteo.com/v1/search"
+    params = {
+        "name": location,
+        "count": 2,
+        "language": "es",
+        "countryCode": "AR"
+    }
+
+    response = requests.get(url, params=params)
+
+    if response.status_code != 200:
+        raise ValueError(f"Failed to fetch coordinates: {response.status_code}, {response.text}")
+
+    data = response.json()
+    if "results" not in data or len(data["results"]) == 0:
+        raise ValueError(f"No results found for location: {location}")
+
+    latitude = data["results"][0]["latitude"]
+    longitude = data["results"][0]["longitude"]
+    return latitude, longitude
+
 # Fetch forecast data from Open-Meteo API
 def fetch_weather_data(latitude: float, longitude: float) -> dict:
     print("Fetching weather data...")
@@ -115,13 +140,13 @@ def convert_hour_to_emoji(hour: int) -> str:
     return HOUR_TO_EMOJI.get(hour)
 
 # Pretty-format the weather data to send via WhatsApp
-def format_weather_message(weather: dict) -> str:
+def format_weather_message(weather: dict, location: str) -> str:
     print("Formatting weather message...")
 
     todays_emoji = convert_wmo_to_emoji(weather['daily']['weather_code'])
     if todays_emoji is None: todays_emoji = convert_cloud_cover_to_emoji(weather["daily"]["cloud_cover"])
 
-    message = f"{todays_emoji} *Weather Forecast*\n"
+    message = f"{todays_emoji} *Weather Forecast in {location}*\n"
     message += "~------------------------------~\n"
     message += "Next 6-hour forecast:\n"
     for time, details in weather.items():
@@ -142,8 +167,10 @@ def format_weather_message(weather: dict) -> str:
     return message.strip()
 
 if __name__ == "__main__":
-    weather_data = fetch_weather_data(-34.7236, -58.7923)
+    location = "Mariano Acosta"
+    latitude, longitude = fetch_coordinates(location)
+    weather_data = fetch_weather_data(latitude, longitude)
     weather = convert_weather_data(weather_data)
-    message = format_weather_message(weather)
+    message = format_weather_message(weather, location)
     send_whatsapp_message(message)
     print(message)
