@@ -22,6 +22,27 @@ HOUR_TO_EMOJI = {
     1: "🕐", 2: "🕑", 3: "🕒", 4: "🕓", 5: "🕔", 6: "🕕", 7: "🕖", 8: "🕗", 9: "🕘", 10: "🕙", 11: "🕚", 12: "🕛"
 }
 
+FEELS_LIKE_TO_EMOJI = {
+    (float('-inf'), 0): "🥶", # < 0 °C
+    (0, 11): "❄️", # 0-10 °C
+    (11, 21): "🙂", # 11-20 °C
+    (21, 31): "🥵", # 21-30 °C
+    (31, float("inf")): "🔥" # > 30 °C
+}
+
+PRECIPITATION_PROBABILITY_TO_EMOJI = {
+    range(0, 60): "☂️",  # 0-59%
+    range(60, 101): "☔",  # 60-100%
+}
+
+UV_INDEX_TO_EMOJI = {
+    (0, 3): "🟢",  # 0-2
+    (3, 6): "🟡",  # 3-5
+    (6, 8): "🟠",  # 6-7
+    (8, 11): "🔴",  # 8-10
+    (11, float('inf')): "🟣",  # 11+
+}
+
 # Upload media to WhatsApp servers
 def upload_media_to_whatsapp(file_path: str) -> str:
     print("Uploading media to WhatsApp...")
@@ -152,16 +173,31 @@ def convert_cloud_cover_to_emoji(cloud_cover: int) -> str | None:
     for cover_range, emoji in CLOUD_COVER_TO_EMOJI.items():
         if cloud_cover in cover_range:
             return emoji
-    return None
+
+def convert_hour_to_emoji(hour: int) -> str:
+    return HOUR_TO_EMOJI.get(hour)
+
+def convert_feels_like_to_emoji(feels_like: int) -> str:
+    for feels_like_range, emoji in FEELS_LIKE_TO_EMOJI.items():
+        if feels_like_range[0] <= feels_like < feels_like_range[1]:
+            return emoji
+    return "❓"
+
+def convert_precipitation_probability_to_emoji(precipitation_probability: int) -> str:
+    for probability_range, emoji in PRECIPITATION_PROBABILITY_TO_EMOJI.items():
+        if precipitation_probability in probability_range:
+            return emoji
+        
+def convert_uv_index_to_emoji(uv_index: int) -> str:
+    for uv_range, emoji in UV_INDEX_TO_EMOJI.items():
+        if uv_range[0] <= uv_index < uv_range[1]:
+            return emoji
 
 def convert_unix_to_readable(unix_time: int, utc_offset: int = 0) -> str:
     return datetime.fromtimestamp(unix_time + utc_offset).strftime("%H:%M").lstrip("0")
 
 def get_hour_from_unix(unix_time: int, utc_offset: int = 0) -> int:
     return int(datetime.fromtimestamp(unix_time + utc_offset).strftime("%I").lstrip("0"))
-
-def convert_hour_to_emoji(hour: int) -> str:
-    return HOUR_TO_EMOJI.get(hour)
 
 # Generate line graph of temperature, cloud cover, precipitation probability, and UV index (unused in WhatsApp messagging)
 def generate_weather_graph(weather: dict, location: str) -> str:
@@ -240,13 +276,13 @@ def format_weather_message(weather: dict, location: str) -> str:
         message += f"*{convert_hour_to_emoji(get_hour_from_unix(time, weather['meta']['utc_offset_seconds']))} "
         message += f"{convert_unix_to_readable(time, weather['meta']['utc_offset_seconds'])}* "
         message += f"{hour_emoji}\n"
-        message += f"- 🌡️ | {round(details['feels_like'])}°C\n"
-        message += f"- ☔ | {details['precipitation_probability']}%\n"
-        message += f"- ☀️ | {round(details['uv_index'])}\n\n"
+        message += f"- {convert_feels_like_to_emoji(details['feels_like'])} | {round(details['feels_like'])} °C\n"
+        message += f"- {convert_precipitation_probability_to_emoji(details['precipitation_probability'])} | {details['precipitation_probability']} %\n"
+        message += f"- {convert_uv_index_to_emoji(details['uv_index'])} | {round(details['uv_index'])} UV\n\n"
     message += "> Forecast provided by _Open-Meteo_\n"
     message += "~------------------------------~\n"
     message += "_Due to WhatsApp limitations, remember to send here any message before 24 hours passes from *your* previous message._\n"
-    message += "_If not done, you *will not* receive further forecast updates._"
+    message += "_If not done, you *will not* receive the next forecast updates before you send a message._"
     return message.strip()
 
 if __name__ == "__main__":
