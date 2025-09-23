@@ -122,7 +122,7 @@ def fetch_weather_data(latitude: float, longitude: float) -> dict:
         "latitude": latitude,
         "longitude": longitude,
         "forecast_days": 1,
-        "forecast_hours": 7,
+        "forecast_hours": 12,
         "hourly": "weather_code,cloud_cover,apparent_temperature,precipitation_probability,uv_index",
         "daily": "weather_code,cloud_cover_mean",
         "timezone": "auto",
@@ -270,9 +270,11 @@ def format_weather_message(weather: dict, location: str) -> str:
     message += f"```{datetime.now().strftime('%d/%b/%Y')}```\n"
     message += "~------------------------------~\n"
     message += "Next 6-hour forecast:\n"
-    for time, details in weather.items():
+    for i, (time, details) in enumerate(weather.items()):
         if time == "daily" or time == "meta":
             continue
+        if i > 7:
+            break
         hour_emoji = convert_wmo_to_emoji(details["weather_code"])
         if hour_emoji is None: hour_emoji = convert_cloud_cover_to_emoji(details["cloud_cover"])
         message += f"*{convert_hour_to_emoji(get_hour_from_unix(time, weather['meta']['utc_offset_seconds']))} "
