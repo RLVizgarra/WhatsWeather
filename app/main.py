@@ -226,6 +226,9 @@ def generate_weather_graph(weather: dict, location: str) -> str:
     plt.title("Feels Like Temperature (°C)")
     plt.xlabel("Time")
     plt.ylabel("°C")
+    y_step = (ax.get_yticks()[1] - ax.get_yticks()[0]) - 1/3
+    plt.ylim(int(min(temperatures)) - y_step, int(max(temperatures)) + y_step)
+    plt.xlim(hours[0], hours[-1])
     plt.grid(True)
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
 
@@ -235,6 +238,7 @@ def generate_weather_graph(weather: dict, location: str) -> str:
     plt.xlabel("Time")
     plt.ylabel("%")
     plt.ylim(0, 100)
+    plt.xlim(hours[0], hours[-1])
     plt.grid(True)
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
 
@@ -244,6 +248,7 @@ def generate_weather_graph(weather: dict, location: str) -> str:
     plt.xlabel("Time")
     plt.ylabel("%")
     plt.ylim(0, 100)
+    plt.xlim(hours[0], hours[-1])
     plt.grid(True)
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
 
@@ -252,7 +257,10 @@ def generate_weather_graph(weather: dict, location: str) -> str:
     plt.title("UV Index")
     plt.xlabel("Time")
     plt.ylabel("UV")
-    plt.ylim(0)
+    y_step = (ax.get_yticks()[1] - ax.get_yticks()[0]) - 1/3
+    if y_step < 0: y_step *= -1
+    plt.ylim(0, int(max(uv_indices)) + y_step)
+    plt.xlim(hours[0], hours[-1])
     plt.grid(True)
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
 
@@ -295,9 +303,10 @@ def format_weather_message(weather: dict, location: str) -> str:
 
 if __name__ == "__main__":
     location = "Mariano Acosta"
+    
     latitude, longitude = fetch_coordinates(location)
     weather_data = fetch_weather_data(latitude, longitude)
     weather = convert_weather_data(weather_data)
     message = format_weather_message(weather, location)
-    send_whatsapp_message(message, generate_weather_graph(weather, location))
-    print(message)
+    weather_graph = generate_weather_graph(weather, location)
+    send_whatsapp_message(message, weather_graph)
