@@ -194,10 +194,10 @@ def convert_uv_index_to_emoji(uv_index: int) -> str:
             return emoji
 
 def convert_unix_to_readable(unix_time: int, utc_offset: int = 0) -> str:
-    return datetime.fromtimestamp(unix_time + utc_offset).strftime("%H:%M").lstrip("0")
+    return datetime.fromtimestamp(unix_time + utc_offset).strftime("%H:%M")
 
 def get_hour_from_unix(unix_time: int, utc_offset: int = 0) -> int:
-    return int(datetime.fromtimestamp(unix_time + utc_offset).strftime("%I").lstrip("0"))
+    return int(datetime.fromtimestamp(unix_time + utc_offset).strftime("%I"))
 
 # Generate line graph of temperature, cloud cover, precipitation probability, and UV index (unused in WhatsApp messagging)
 def generate_weather_graph(weather: dict, location: str) -> str:
