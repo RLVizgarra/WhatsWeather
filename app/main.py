@@ -1,3 +1,4 @@
+import math
 import os
 from dotenv import load_dotenv
 import requests
@@ -258,9 +259,7 @@ def generate_weather_graph(weather: dict, location: str) -> str:
     plt.title("UV Index")
     plt.xlabel("Time")
     plt.ylabel("UV")
-    y_step = (ax.get_yticks()[1] - ax.get_yticks()[0]) - 1/3
-    if y_step < 0: y_step *= -1
-    plt.ylim(0, int(max(uv_indices)) + y_step)
+    plt.ylim(0, math.ceil(max(uv_indices)))
     plt.xlim(hours[0], hours[-1])
     plt.grid(True)
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
