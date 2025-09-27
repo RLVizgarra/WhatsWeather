@@ -124,7 +124,7 @@ def fetch_weather_data(latitude: float, longitude: float) -> dict:
         "forecast_days": 1,
         "forecast_hours": 12,
         "hourly": "weather_code,cloud_cover,apparent_temperature,precipitation_probability,uv_index",
-        "daily": "weather_code,cloud_cover_mean",
+        "daily": "weather_code,cloud_cover_mean,apparent_temperature_max,apparent_temperature_min",
         "timezone": "auto",
         "timeformat": "unixtime"
     }
@@ -145,7 +145,9 @@ def convert_weather_data(weather_data: dict) -> dict:
         },
         "daily": {
             "weather_code": weather_data["daily"]["weather_code"][0],
-            "cloud_cover": weather_data["daily"]["cloud_cover_mean"][0]
+            "cloud_cover": weather_data["daily"]["cloud_cover_mean"][0],
+            "feels_like_max": weather_data["daily"]["apparent_temperature_max"][0],
+            "feels_like_min": weather_data["daily"]["apparent_temperature_min"][0]
         }
     }
 
@@ -226,8 +228,7 @@ def generate_weather_graph(weather: dict, location: str) -> str:
     plt.title("Feels Like Temperature (°C)")
     plt.xlabel("Time")
     plt.ylabel("°C")
-    y_step = (ax.get_yticks()[1] - ax.get_yticks()[0]) - 1/3
-    plt.ylim(int(min(temperatures)) - y_step, int(max(temperatures)) + y_step)
+    plt.ylim(math.floor(weather["daily"]["feels_like_min"]), math.ceil(weather["daily"]["feels_like_max"]))
     plt.xlim(hours[0], hours[-1])
     plt.grid(True)
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
