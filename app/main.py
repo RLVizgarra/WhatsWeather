@@ -10,6 +10,7 @@ load_dotenv()
 
 
 if __name__ == "__main__":
+    # TODO: Change location to be user-inputted
     location = "Mariano Acosta"
 
     latitude, longitude = weather.fetch_coordinates(location)

@@ -1,3 +1,4 @@
 .devcontainer
 .env
 *.png
+app/__pycache__
