@@ -1,22 +1,17 @@
-# Use official Python image as base
 FROM python:3.13-slim
 
-# Set working directory
 WORKDIR /app
 
-# Copy requirements file
 COPY requirements.txt .
 
-# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 
-# Copy application code
 COPY app/ .
 
-# Set environment variables (these can also be set via a .env file)
-ENV WHATSAPP_ACCESS_TOKEN=${WHATSAPP_ACCESS_TOKEN}
-ENV WHATSAPP_PHONE_NUMBER_ID=${WHATSAPP_PHONE_NUMBER_ID}
-ENV WHATSAPP_TO_PHONE_NUMBER=${WHATSAPP_TO_PHONE_NUMBER}
+ENV WHATSAPP_ACCESS_TOKEN=your_whatsapp_access_token
+ENV WHATSAPP_PHONE_NUMBER_ID=your_whatsapp_phone_number_id
+ENV WHATSAPP_TO_PHONE_NUMBER=your_whatsapp_to_phone_number
 
-# Run the application (replace with your actual entrypoint)
+EXPOSE 5000
+
 CMD ["python", "main.py"]

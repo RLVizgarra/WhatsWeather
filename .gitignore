@@ -1,4 +1,4 @@
-.devcontainer
-.env
 *.png
-app/__pycache__
+.env
+.venv
+docker-compose.yml
