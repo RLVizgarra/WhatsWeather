@@ -30,6 +30,19 @@ def generate_weather_graph(weather: dict, location: str) -> str:
 
     plt.figure(figsize=(10, 6))
 
+    generate_temp_plot(hours, temperatures, weather)
+    generate_cloud_plot(hours, cloud_covers)
+    generate_precipitation_plot(hours, precipitation_probabilities)
+    generate_uv_plot(hours, uv_indices)
+
+    plt.suptitle(f"Weather Forecast for {location}", fontsize=16)
+    plt.figtext(0.5, 0.02, f"{datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).strftime('%d/%b/%Y')} | Open-Meteo", ha="center", fontsize=10, color="gray")
+    plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+    plt.savefig(filename, dpi=300)
+    plt.close()
+    return os.path.join(os.getcwd(), filename)
+
+def generate_temp_plot(hours: list, temperatures: list, weather: dict) -> None:
     ax = plt.subplot(2, 2, 1)
     plt.plot(hours, temperatures, marker="o", color="tab:red")
     plt.title("Feels Like Temperature (°C)")
@@ -44,6 +57,7 @@ def generate_weather_graph(weather: dict, location: str) -> str:
     plt.grid(True)
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
 
+def generate_cloud_plot(hours: list, cloud_covers: list) -> None:
     ax = plt.subplot(2, 2, 2)
     plt.plot(hours, cloud_covers, marker="o", color="tab:cyan")
     plt.title("Cloud Cover (%)")
@@ -54,6 +68,7 @@ def generate_weather_graph(weather: dict, location: str) -> str:
     plt.grid(True)
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
 
+def generate_precipitation_plot(hours: list, precipitation_probabilities: list) -> None:
     ax = plt.subplot(2, 2, 3)
     plt.plot(hours, precipitation_probabilities, marker="o", color="tab:blue")
     plt.title("Precipitation Probability (%)")
@@ -64,6 +79,7 @@ def generate_weather_graph(weather: dict, location: str) -> str:
     plt.grid(True)
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
 
+def generate_uv_plot(hours: list, uv_indices: list) -> None:
     ax = plt.subplot(2, 2, 4)
     plt.plot(hours, uv_indices, marker="o", color="tab:orange")
     plt.title("UV Index")
@@ -73,10 +89,3 @@ def generate_weather_graph(weather: dict, location: str) -> str:
     plt.xlim(hours[0], hours[-1])
     plt.grid(True)
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
-
-    plt.suptitle(f"Weather Forecast for {location}", fontsize=16)
-    plt.figtext(0.5, 0.02, f"{datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).strftime('%d/%b/%Y')} | Open-Meteo", ha="center", fontsize=10, color="gray")
-    plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-    plt.savefig(filename, dpi=300)
-    plt.close()
-    return os.path.join(os.getcwd(), filename)

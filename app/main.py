@@ -8,6 +8,7 @@ import whatsapp
 
 load_dotenv()
 
+
 if __name__ == "__main__":
     location = "Mariano Acosta"
 
