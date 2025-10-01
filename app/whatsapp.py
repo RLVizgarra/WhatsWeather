@@ -6,7 +6,7 @@ import requests
 def upload_media_to_whatsapp(file_path: str) -> str:
     print("Uploading media to WhatsApp...")
 
-    url = "https://graph.facebook.com/v22.0/847601278427395/media"
+    url = f"https://graph.facebook.com/v22.0/{os.getenv("WHATSAPP_PHONE_NUMER_ID")}/media"
     headers = {
         "Authorization": f"Bearer {os.getenv('WHATSAPP_ACCESS_TOKEN')}",
     }
@@ -28,7 +28,7 @@ def upload_media_to_whatsapp(file_path: str) -> str:
 def send_whatsapp_message(message: str, image_path: str) -> None:
     print("Sending WhatsApp message...")
 
-    url = "https://graph.facebook.com/v22.0/847601278427395/messages"
+    url = f"https://graph.facebook.com/v22.0/{os.getenv("WHATSAPP_PHONE_NUMER_ID")}/messages"
     headers = {
         "Authorization": f"Bearer {os.getenv('WHATSAPP_ACCESS_TOKEN')}"
     }
