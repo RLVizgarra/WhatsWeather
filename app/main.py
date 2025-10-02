@@ -1,4 +1,5 @@
 import os
+import time
 from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import PlainTextResponse
@@ -35,16 +36,25 @@ async def handle_whatsapp_webhook(req: Request):
     notification = notification["messages"][0]
     id = notification["id"]
     sender = notification["from"]
+    timestamp = notification["timestamp"]
+    now = int(time.time())
+    if now - int(timestamp) > 60:
+        whatsapp.mark_message_read(id)
+        return
     #text = notification["text"]["body"] # TODO: use this to get user input for location
     location = "Mariano Acosta"
 
-    whatsapp.mark_message_read(id)
+    whatsapp.set_typing_indicator_and_as_read(id)
+    send_whatsapp_forecast(sender, location)
+
+@app.post("/whatsapp/send")
+def send_whatsapp_forecast(to: str, location: str):
     latitude, longitude = weather.fetch_coordinates(location)
     weather_raw_data = weather.fetch_weather_data(latitude, longitude)
     weather_data = reformat.convert_weather_data(weather_raw_data)
     message = reformat.format_weather_message(weather_data, location)
     weather_graph = graph.generate_weather_graph(weather_data, location)
-    whatsapp.send_whatsapp_message(sender, message, weather_graph)
+    whatsapp.send_whatsapp_message(to, message, weather_graph)
 
 if __name__ == "__main__":
     uvicorn.run(
