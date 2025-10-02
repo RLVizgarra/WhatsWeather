@@ -2,7 +2,7 @@ import requests
 
 
 # Fetch coordinates from Open-Meteo API
-def fetch_coordinates(location: str) -> tuple[float, float]:
+def fetch_coordinates(location: str) -> tuple[float, float] | None:
     print("Fetching coordinates...")
 
     url = "https://geocoding-api.open-meteo.com/v1/search"
@@ -20,7 +20,7 @@ def fetch_coordinates(location: str) -> tuple[float, float]:
 
     data = response.json()
     if "results" not in data or len(data["results"]) == 0:
-        raise ValueError(f"No results found for location: {location}")
+        return None
 
     latitude = data["results"][0]["latitude"]
     longitude = data["results"][0]["longitude"]
