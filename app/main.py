@@ -33,10 +33,12 @@ async def handle_whatsapp_webhook(req: Request):
     if "messages" not in notification:
         return
     notification = notification["messages"][0]
+    id = notification["id"]
     sender = notification["from"]
     #text = notification["text"]["body"] # TODO: use this to get user input for location
     location = "Mariano Acosta"
 
+    whatsapp.mark_message_read(id)
     latitude, longitude = weather.fetch_coordinates(location)
     weather_raw_data = weather.fetch_weather_data(latitude, longitude)
     weather_data = reformat.convert_weather_data(weather_raw_data)
