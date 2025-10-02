@@ -35,11 +35,10 @@ async def handle_whatsapp_webhook(req: Request):
     if now - int(timestamp) > 60:
         whatsapp.mark_message_read(id)
         raise HTTPException(status_code=400, detail="Message too old to process")
-    #text = notification["text"]["body"] # TODO: use this to get user input for location
-    location = "Mariano Acosta"
+    text = notification["text"]["body"]
 
     whatsapp.set_typing_indicator_and_as_read(id)
-    send_whatsapp_forecast(sender, location)
+    send_whatsapp_forecast(sender, text)
     return {"detail": "Message processed"}
 
 @app.post("/whatsapp/send")
