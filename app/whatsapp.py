@@ -44,7 +44,7 @@ def set_typing_indicator_and_as_read(message_id: str) -> None:
         raise ValueError(f"Failed to set typing indicator and as read: {response.status_code}, {response.text}")
 
 # Upload media to WhatsApp servers
-def upload_media_to_whatsapp(file_path: str) -> str:
+def upload_image(file_path: str) -> str:
     print("Uploading media to WhatsApp...")
 
     url = f"https://graph.facebook.com/v22.0/{os.getenv('WHATSAPP_PHONE_NUMBER_ID')}/media"
@@ -65,8 +65,8 @@ def upload_media_to_whatsapp(file_path: str) -> str:
 
     return response.json().get("id")
 
-# Whatsapp API call to send a message
-def send_whatsapp_message(to: str, message: str, image_path: str) -> None:
+# Whatsapp API call to send the forecast as a message
+def send_forecast(to: str, message: str, image_path: str) -> None:
     print("Sending WhatsApp message...")
 
     if to.startswith("54911"):
@@ -81,7 +81,7 @@ def send_whatsapp_message(to: str, message: str, image_path: str) -> None:
         "to": to,
         "type": "image",
         "image": {
-            "id": upload_media_to_whatsapp(image_path),
+            "id": upload_image(image_path),
             "caption": message
         }
     }
@@ -90,4 +90,29 @@ def send_whatsapp_message(to: str, message: str, image_path: str) -> None:
 
     if response.status_code != 200:
         raise ValueError(f"Failed to send message: {response.status_code}, {response.text}")
+    
+# Whatsapp API call to report location not found
+def send_location_not_found(to: str) -> None:
+    print("Sending location not found message...")
+
+    if to.startswith("54911"):
+        to = "5411" + to[5:]
+
+    url = f"https://graph.facebook.com/v22.0/{os.getenv('WHATSAPP_PHONE_NUMBER_ID')}/messages"
+    headers = {
+        "Authorization": f"Bearer {os.getenv('WHATSAPP_ACCESS_TOKEN')}"
+    }
+    payload = {
+        "messaging_product": "whatsapp",
+        "to": to,
+        "type": "text",
+        "text": {
+            "body": "The given location was not found. Please try again with a different location."
+        }
+    }
+
+    response = requests.post(url, headers=headers, json=payload)
+
+    if response.status_code != 200:
+        raise ValueError(f"Failed to send location not found message: {response.status_code}, {response.text}")
     
