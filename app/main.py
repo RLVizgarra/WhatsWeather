@@ -17,7 +17,7 @@ app = FastAPI()
 def ping():
     return "pong"
 
-@app.get("/webhook/whatsapp", response_class=PlainTextResponse)
+@app.get("/whatsapp/webhook", response_class=PlainTextResponse)
 def verify_webhook_whatsapp(req: Request):
     params = dict(req.query_params)
 
@@ -26,7 +26,7 @@ def verify_webhook_whatsapp(req: Request):
     
     raise HTTPException(status_code=404, detail="Not Found")
 
-@app.post("/webhook/whatsapp")
+@app.post("/whatsapp/webhook")
 async def handle_whatsapp_webhook(req: Request):
     json: dict = await req.json()
     notification = json["entry"][0]["changes"][0]["value"]
