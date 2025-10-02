@@ -26,7 +26,7 @@ async def handle_whatsapp_webhook(req: Request):
     json: dict = await req.json()
     notification = json["entry"][0]["changes"][0]["value"]
     if "messages" not in notification:
-        return
+        raise HTTPException(status_code=400, detail="No messages to process")
     notification = notification["messages"][0]
     id = notification["id"]
     sender = notification["from"]
@@ -34,12 +34,13 @@ async def handle_whatsapp_webhook(req: Request):
     now = int(time.time())
     if now - int(timestamp) > 60:
         whatsapp.mark_message_read(id)
-        return
+        raise HTTPException(status_code=400, detail="Message too old to process")
     #text = notification["text"]["body"] # TODO: use this to get user input for location
     location = "Mariano Acosta"
 
     whatsapp.set_typing_indicator_and_as_read(id)
     send_whatsapp_forecast(sender, location)
+    return {"detail": "Message processed"}
 
 @app.post("/whatsapp/send")
 def send_whatsapp_forecast(to: str, location: str):
@@ -49,3 +50,4 @@ def send_whatsapp_forecast(to: str, location: str):
     message = reformat.format_weather_message(weather_data, location)
     weather_graph = graph.generate_weather_graph(weather_data, location)
     whatsapp.send_whatsapp_message(to, message, weather_graph)
+    return {"detail": "Message sent"}
