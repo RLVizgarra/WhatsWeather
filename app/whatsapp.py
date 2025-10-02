@@ -2,9 +2,28 @@ import os
 import requests
 
 
-# Mark message as read and set typing indicator
+# Mark message as read
 def mark_message_read(message_id: str) -> None:
     print("Marking message as read...")
+
+    url = f"https://graph.facebook.com/v22.0/{os.getenv('WHATSAPP_PHONE_NUMBER_ID')}/messages"
+    headers = {
+        "Authorization": f"Bearer {os.getenv('WHATSAPP_ACCESS_TOKEN')}"
+    }
+    payload = {
+        "messaging_product": "whatsapp",
+        "status": "read",
+        "message_id": message_id
+    }
+
+    response = requests.post(url, headers=headers, json=payload)
+
+    if response.status_code != 200:
+        raise ValueError(f"Failed to mark message as read: {response.status_code}, {response.text}")
+    
+# Mark message as read and set typing indicator
+def set_typing_indicator_and_as_read(message_id: str) -> None:
+    print("Setting typing indicator and as read...")
 
     url = f"https://graph.facebook.com/v22.0/{os.getenv('WHATSAPP_PHONE_NUMBER_ID')}/messages"
     headers = {
@@ -22,7 +41,7 @@ def mark_message_read(message_id: str) -> None:
     response = requests.post(url, headers=headers, json=payload)
 
     if response.status_code != 200:
-        raise ValueError(f"Failed to mark message as read: {response.status_code}, {response.text}")
+        raise ValueError(f"Failed to set typing indicator and as read: {response.status_code}, {response.text}")
 
 # Upload media to WhatsApp servers
 def upload_media_to_whatsapp(file_path: str) -> str:
