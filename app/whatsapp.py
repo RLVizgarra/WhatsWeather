@@ -92,7 +92,7 @@ def send_forecast(to: str, message: str, image_path: str) -> None:
         raise ValueError(f"Failed to send message: {response.status_code}, {response.text}")
     
 # Whatsapp API call to report location not found
-def send_location_not_found(to: str) -> None:
+def send_location_not_found(to: str, location: str) -> None:
     print("Sending location not found message...")
 
     if to.startswith("54911"):
@@ -107,7 +107,7 @@ def send_location_not_found(to: str) -> None:
         "to": to,
         "type": "text",
         "text": {
-            "body": "The given location was not found. Please try again with a different location."
+            "body": f"The '{location}' location was not found. Please try again with a different location."
         }
     }
 
