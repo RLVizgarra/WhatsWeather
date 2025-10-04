@@ -69,9 +69,6 @@ def upload_image(file_path: str) -> str:
 def send_forecast(to: str, message: str, image_path: str) -> None:
     print("Sending WhatsApp message...")
 
-    if to.startswith("54911"):
-        to = "5411" + to[5:]
-
     url = f"https://graph.facebook.com/v22.0/{os.getenv('WHATSAPP_PHONE_NUMBER_ID')}/messages"
     headers = {
         "Authorization": f"Bearer {os.getenv('WHATSAPP_ACCESS_TOKEN')}"
@@ -94,9 +91,6 @@ def send_forecast(to: str, message: str, image_path: str) -> None:
 # Whatsapp API call to report location not found
 def send_location_not_found(to: str, location: str) -> None:
     print("Sending location not found message...")
-
-    if to.startswith("54911"):
-        to = "5411" + to[5:]
 
     url = f"https://graph.facebook.com/v22.0/{os.getenv('WHATSAPP_PHONE_NUMBER_ID')}/messages"
     headers = {

@@ -25,29 +25,28 @@ def verify_webhook_whatsapp(req: Request):
 @app.post("/whatsapp/webhook")
 async def handle_whatsapp_webhook(req: Request):
     print("Received WhatsApp webhook")
-    json: dict = await req.json()
+    json = await req.json()
     notification = json["entry"][0]["changes"][0]["value"]
-
     if "messages" not in notification:
         raise HTTPException(status_code=400, detail="No messages to process")
     
     notification = notification["messages"][0]
     id = notification["id"]
-
     if id in seen_messages:
         raise HTTPException(status_code=400, detail="Message already processed")
     seen_messages.append(id)
 
-    sender = notification["from"]
+    sender: str = notification["from"]
+    if sender.startswith("54911"):
+        sender = "5411" + sender[5:]
+
     timestamp = notification["timestamp"]
     now = int(time.time())
-
     if now - int(timestamp) > 60:
         whatsapp.mark_message_read(id)
         raise HTTPException(status_code=400, detail="Message too old to process")
     
     text = notification["text"]["body"]
-
     whatsapp.set_typing_indicator_and_as_read(id)
     send_whatsapp_forecast(sender, text)
 
