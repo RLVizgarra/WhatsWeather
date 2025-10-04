@@ -99,7 +99,6 @@ def send_location_not_found(to: str, location: str) -> None:
     payload = {
         "messaging_product": "whatsapp",
         "to": to,
-        "type": "text",
         "text": {
             "body": f"The '{location}' location was not found. Please try again with a different location."
         }
