@@ -3,7 +3,7 @@ import time
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import PlainTextResponse
 
-import reformat, weather, whatsapp, graph
+import reformat, weather, whatsapp, graph, analytics
 
 
 app = FastAPI()
@@ -47,6 +47,8 @@ async def handle_whatsapp_webhook(req: Request):
         raise HTTPException(status_code=400, detail="Message too old to process")
     
     text = notification["text"]["body"]
+
+    analytics.log(int(timestamp), sender, text)
     whatsapp.set_typing_indicator_and_as_read(id)
     send_whatsapp_forecast(sender, text)
 
