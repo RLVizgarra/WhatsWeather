@@ -1,3 +1,6 @@
+import hashlib
+import hmac
+import json
 import os
 import time
 from fastapi import FastAPI, HTTPException, Request
@@ -28,9 +31,15 @@ def verify_webhook_whatsapp(req: Request):
 
 @app.post("/whatsapp/webhook")
 async def handle_whatsapp_webhook(req: Request):
-    print("Received WhatsApp webhook")
-    json = await req.json()
-    notification = json["entry"][0]["changes"][0]["value"]
+    print("Received notification")
+    given_signature = req.headers["x-hub-signature-256"][7:]
+    raw = await req.body()
+    calculated_signature = hmac.new(os.getenv("META_APP_SECRET").encode("utf-8"), raw, hashlib.sha256).hexdigest()
+    if not hmac.compare_digest(calculated_signature, given_signature):
+        raise HTTPException(status_code=403, detail="Signature mismatch")
+
+    data = json.loads(raw.decode("utf-8"))
+    notification = data["entry"][0]["changes"][0]["value"]
     if "messages" not in notification:
         raise HTTPException(status_code=400, detail="No messages to process")
     
