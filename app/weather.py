@@ -1,9 +1,18 @@
 import requests
 
 
+hardcoded_locations = {
+    "islas malvinas": (-51.695278, -57.849444),
+    "islas georgias del sur": (-54.281472, -36.508028),
+    "islas sandwich del sur": (-57.8, -26.45)
+}
+
 # Fetch coordinates from Open-Meteo API
 def fetch_coordinates(location: str) -> tuple[float, float] | None:
     print("Fetching coordinates...")
+
+    if location.lower() in hardcoded_locations:
+        return hardcoded_locations[location.lower()]
 
     url = "https://geocoding-api.open-meteo.com/v1/search"
     params = {
