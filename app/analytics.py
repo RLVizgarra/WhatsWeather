@@ -4,7 +4,7 @@ import hashlib
 import os
 
 
-CSV_PATH = "logs/analytics.csv"
+CSV_PATH = "../logs/analytics.csv"
 HEADER = ["date", "time", "phone", "location"]
 
 def log(timestamp: int, phone: str, location: str):
