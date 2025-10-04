@@ -3,8 +3,7 @@ import hmac
 import json
 import os
 import time
-from typing import Annotated
-from fastapi import FastAPI, HTTPException, Header, Request
+from fastapi import FastAPI, HTTPException, Header, Query, Request
 from fastapi.responses import PlainTextResponse
 
 import reformat, weather, whatsapp, graph, analytics
@@ -22,21 +21,25 @@ def get_ping():
     return "pong"
 
 @app.get("/whatsapp/webhook", response_class=PlainTextResponse)
-def verify_webhook_whatsapp(req: Request):
-    params = dict(req.query_params)
+def verify_webhook_whatsapp(
+    mode: str = Query(..., alias="hub.mode"),
+    token: str = Query(..., alias="hub.verify_token"),
+    challenge: str = Query(..., alias="hub.challenge")):
 
-    if params.get("hub.mode") == "subscribe" and params.get("hub.verify_token") == os.getenv("WHATSAPP_WEBHOOK_TOKEN") and params.get("hub.challenge"):
-        return params.get("hub.challenge")
+    if mode == "subscribe" and token == os.getenv("WHATSAPP_WEBHOOK_TOKEN") and challenge:
+        return challenge
     
     raise HTTPException(status_code=404, detail="Not Found")
 
 @app.post("/whatsapp/webhook")
-async def handle_whatsapp_webhook(req: Request):
+async def handle_whatsapp_webhook(
+    req: Request,
+    signature: str = Header(..., alias="x-hub-signature-256")):
+
     print("Received notification")
-    given_signature = req.headers["x-hub-signature-256"][7:]
     raw = await req.body()
     calculated_signature = hmac.new(os.getenv("META_APP_SECRET").encode("utf-8"), raw, hashlib.sha256).hexdigest()
-    if not hmac.compare_digest(calculated_signature, given_signature):
+    if not hmac.compare_digest(calculated_signature, signature[7:]):
         raise HTTPException(status_code=403, detail="Signature mismatch")
 
     data = json.loads(raw.decode("utf-8"))
@@ -69,7 +72,11 @@ async def handle_whatsapp_webhook(req: Request):
     return {"detail": "Message processed"}
 
 @app.post("/whatsapp/send")
-def send_whatsapp_forecast(to: str, location: str, authorization: Annotated[str, Header()]):
+def send_whatsapp_forecast(
+    to: str,
+    location: str,
+    authorization: str = Header(...)):
+    
     print("Sending WhatsApp forecast...")
     if authorization != os.getenv("API_AUTHORIZATION_KEY"):
         raise HTTPException(status_code=403, detail="Invalid Authorization header value")
