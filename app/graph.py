@@ -5,7 +5,7 @@ import os
 from matplotlib import pyplot as plt
 
 
-# Generate line graph of temperature, cloud cover, precipitation probability, and UV index (unused in WhatsApp messagging)
+# Generate line graph of temperature, cloud cover, precipitation probability, and UV index
 def generate_weather_graph(weather: dict, location: str) -> str:
     print("Generating weather graph...")
 

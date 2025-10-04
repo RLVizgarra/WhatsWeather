@@ -9,8 +9,12 @@ import reformat, weather, whatsapp, graph, analytics
 app = FastAPI()
 seen_messages = []
 
+@app.head("/ping")
+def head_ping():
+    return
+
 @app.get("/ping", response_class=PlainTextResponse)
-def ping():
+def get_ping():
     return "pong"
 
 @app.get("/whatsapp/webhook", response_class=PlainTextResponse)
