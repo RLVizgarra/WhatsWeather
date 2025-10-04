@@ -36,7 +36,7 @@ def generate_weather_graph(weather: dict, location: str) -> str:
     generate_precipitation_plot(hours, precipitation_probabilities)
     generate_uv_plot(hours, uv_indices)
 
-    plt.suptitle(f"Weather Forecast for {location}", fontsize=16)
+    plt.suptitle(f"Weather Forecast for {location.title()}", fontsize=16)
     # TODO: Change timezone to be decided by Open-Meteo's response
     plt.figtext(0.5, 0.02, f"{datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).strftime('%d/%b/%Y')} | Open-Meteo", ha="center", fontsize=10, color="gray")
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])

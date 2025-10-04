@@ -47,7 +47,7 @@ def format_weather_message(weather: dict, location: str) -> str:
     todays_emoji = convert_wmo_to_emoji(weather["daily"]["weather_code"])
     if todays_emoji is None: todays_emoji = convert_cloud_cover_to_emoji(weather["daily"]["cloud_cover"])
 
-    message = f"{todays_emoji} *Weather Forecast for {location}*\n"
+    message = f"{todays_emoji} *Weather Forecast for {location.title()}*\n"
     # TODO: Change timezone to be decided by Open-Meteo's response
     message += f"```{datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).strftime('%d/%b/%Y')}```\n"
     message += "~------------------------------~\n"
