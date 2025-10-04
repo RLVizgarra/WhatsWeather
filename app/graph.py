@@ -49,10 +49,9 @@ def generate_temp_plot(hours: list, temperatures: list, weather: dict) -> None:
     feels_like_max = math.ceil(weather["daily"]["feels_like_max"])
     if feels_like_min > min(temperatures): feels_like_min = math.floor(min(temperatures))
     if feels_like_max < max(temperatures): feels_like_max = math.ceil(max(temperatures))
-    print(feels_like_min, feels_like_max)
     feels_like_min -= feels_like_min % 5
-    feels_like_max += feels_like_max % 5 - 1
-    print(feels_like_min, feels_like_max)
+    feels_like_max += feels_like_max % 5
+    if feels_like_max % 10 != 0: feels_like_max -= 1
     plt.ylim(feels_like_min, feels_like_max)
     plt.xlim(hours[0], hours[-1])
     plt.grid(True)
