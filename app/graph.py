@@ -5,15 +5,12 @@ from zoneinfo import ZoneInfo
 
 from matplotlib import pyplot as plt
 
-from reformat import convert_unix_to_readable
-
 
 # Generate line graph of temperature, cloud cover, precipitation probability, and UV index (unused in WhatsApp messagging)
 def generate_weather_graph(weather: dict, location: str) -> str:
     print("Generating weather graph...")
 
-    # TODO: Change timezone to be decided by Open-Meteo's response
-    filename = f"{datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).strftime('%Y-%m-%d')}_{location.replace(' ', '_')}_forecast.png"
+    filename = f"{datetime.now(ZoneInfo(weather['meta']['timezone'])).strftime('%Y-%m-%d')}_{location.replace(' ', '_')}_forecast.png"
     hours = []
     temperatures = []
     cloud_covers = []
@@ -23,7 +20,7 @@ def generate_weather_graph(weather: dict, location: str) -> str:
     for time, details in weather.items():
         if time == "daily" or time == "meta":
             continue
-        hours.append(convert_unix_to_readable(time, weather["meta"]["utc_offset_seconds"]))
+        hours.append(datetime.fromtimestamp(time, weather["meta"]["timezone"]))
         temperatures.append(details["feels_like"])
         cloud_covers.append(details["cloud_cover"])
         precipitation_probabilities.append(details["precipitation_probability"])
@@ -37,8 +34,7 @@ def generate_weather_graph(weather: dict, location: str) -> str:
     generate_uv_plot(hours, uv_indices)
 
     plt.suptitle(f"Weather Forecast for {location.title()}", fontsize=16)
-    # TODO: Change timezone to be decided by Open-Meteo's response
-    plt.figtext(0.5, 0.02, f"{datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).strftime('%d/%b/%Y')} | Open-Meteo", ha="center", fontsize=10, color="gray")
+    plt.figtext(0.5, 0.02, f"{datetime.now(ZoneInfo(weather['meta']['timezone'])).strftime('%d/%b/%Y')} | Open-Meteo", ha="center", fontsize=10, color="gray")
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
     plt.savefig(filename, dpi=300)
     plt.close()
@@ -95,3 +91,4 @@ def generate_uv_plot(hours: list, uv_indices: list) -> None:
     plt.xlim(hours[0], hours[-1])
     plt.grid(True)
     ax.set_xticklabels(ax.get_xticklabels(), rotation=45, ha="right")
+    

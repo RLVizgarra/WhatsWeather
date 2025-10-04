@@ -48,8 +48,7 @@ def format_weather_message(weather: dict, location: str) -> str:
     if todays_emoji is None: todays_emoji = convert_cloud_cover_to_emoji(weather["daily"]["cloud_cover"])
 
     message = f"{todays_emoji} *Weather Forecast for {location.title()}*\n"
-    # TODO: Change timezone to be decided by Open-Meteo's response
-    message += f"```{datetime.now(ZoneInfo('America/Argentina/Buenos_Aires')).strftime('%d/%b/%Y')}```\n"
+    message += f"```{datetime.now(weather['meta']['timezone']).strftime('%d/%b/%Y')}```\n"
     message += "~-------------~\n"
     message += "Next 6-hour forecast:\n"
     for i, (time, details) in enumerate(weather.items()):
@@ -59,8 +58,8 @@ def format_weather_message(weather: dict, location: str) -> str:
             break
         hour_emoji = convert_wmo_to_emoji(details["weather_code"])
         if hour_emoji is None: hour_emoji = convert_cloud_cover_to_emoji(details["cloud_cover"])
-        message += f"*{convert_hour_to_emoji(get_hour_from_unix(time, weather['meta']['utc_offset_seconds']))} "
-        message += f"{convert_unix_to_readable(time, weather['meta']['utc_offset_seconds'])}* "
+        message += f"*{convert_hour_to_emoji(time, weather['meta']['timezone'])} "
+        message += f"{datetime.fromtimestamp(time, weather['meta']['timezone']).strftime('%H:%M')}* "
         message += f"{hour_emoji}\n"
         message += f"- {convert_feels_like_to_emoji(details['feels_like'])} | {round(details['feels_like'])} °C\n"
         message += f"- {convert_precipitation_probability_to_emoji(details['precipitation_probability'])} | {details['precipitation_probability']} %\n"
@@ -77,7 +76,7 @@ def convert_weather_data(weather_data: dict) -> dict:
 
     weather = {
         "meta": {
-            "utc_offset_seconds": weather_data["utc_offset_seconds"],
+            "timezone": weather_data["timezone"],
         },
         "daily": {
             "weather_code": weather_data["daily"]["weather_code"][0],
@@ -112,7 +111,8 @@ def convert_cloud_cover_to_emoji(cloud_cover: int) -> str | None:
         if cloud_cover in cover_range:
             return emoji
 
-def convert_hour_to_emoji(hour: int) -> str:
+def convert_hour_to_emoji(unix_time: int, timezone: ZoneInfo) -> str:
+    hour = datetime.fromtimestamp(unix_time, timezone).strftime('%I')
     return HOUR_TO_EMOJI.get(hour)
 
 def convert_feels_like_to_emoji(feels_like: int) -> str:
@@ -130,9 +130,4 @@ def convert_uv_index_to_emoji(uv_index: int) -> str:
     for uv_range, emoji in UV_INDEX_TO_EMOJI.items():
         if uv_range[0] <= uv_index < uv_range[1]:
             return emoji
-
-def convert_unix_to_readable(unix_time: int, utc_offset: int = 0) -> str:
-    return datetime.fromtimestamp(unix_time + utc_offset).strftime("%H:%M")
-
-def get_hour_from_unix(unix_time: int, utc_offset: int = 0) -> int:
-    return int(datetime.fromtimestamp(unix_time + utc_offset).strftime("%I"))
+        
