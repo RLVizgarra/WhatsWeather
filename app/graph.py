@@ -9,7 +9,9 @@ from matplotlib import pyplot as plt
 def generate_weather_graph(weather: dict, location: str) -> str:
     print("Generating weather graph...")
 
-    filename = f"{datetime.now(weather['meta']['timezone']).strftime('%Y-%m-%d')}_{location.replace(' ', '_')}_forecast.png"
+    if not os.path.exists("../graphs/"):
+        os.mkdir("../graphs/")
+    filename = f"../graphs/{datetime.now(weather['meta']['timezone']).strftime('%Y-%m-%d')}_{location.lower().replace(' ', '_')}_forecast.png"
     hours = []
     temperatures = []
     cloud_covers = []
