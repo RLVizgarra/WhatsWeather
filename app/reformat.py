@@ -76,7 +76,7 @@ def convert_weather_data(weather_data: dict) -> dict:
 
     weather = {
         "meta": {
-            "timezone": weather_data["timezone"],
+            "timezone": ZoneInfo(weather_data["timezone"]),
         },
         "daily": {
             "weather_code": weather_data["daily"]["weather_code"][0],
@@ -112,8 +112,8 @@ def convert_cloud_cover_to_emoji(cloud_cover: int) -> str | None:
             return emoji
 
 def convert_hour_to_emoji(unix_time: int, timezone: ZoneInfo) -> str:
-    hour = datetime.fromtimestamp(unix_time, timezone).strftime('%I')
-    return HOUR_TO_EMOJI.get(hour)
+    hour = datetime.fromtimestamp(unix_time, timezone).strftime("%I")
+    return HOUR_TO_EMOJI.get(int(hour))
 
 def convert_feels_like_to_emoji(feels_like: int) -> str:
     for feels_like_range, emoji in FEELS_LIKE_TO_EMOJI.items():

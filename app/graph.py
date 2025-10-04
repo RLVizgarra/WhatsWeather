@@ -1,7 +1,6 @@
 from datetime import datetime
 import math
 import os
-from zoneinfo import ZoneInfo
 
 from matplotlib import pyplot as plt
 
@@ -10,7 +9,7 @@ from matplotlib import pyplot as plt
 def generate_weather_graph(weather: dict, location: str) -> str:
     print("Generating weather graph...")
 
-    filename = f"{datetime.now(ZoneInfo(weather['meta']['timezone'])).strftime('%Y-%m-%d')}_{location.replace(' ', '_')}_forecast.png"
+    filename = f"{datetime.now(weather['meta']['timezone']).strftime('%Y-%m-%d')}_{location.replace(' ', '_')}_forecast.png"
     hours = []
     temperatures = []
     cloud_covers = []
@@ -20,7 +19,7 @@ def generate_weather_graph(weather: dict, location: str) -> str:
     for time, details in weather.items():
         if time == "daily" or time == "meta":
             continue
-        hours.append(datetime.fromtimestamp(time, weather["meta"]["timezone"]))
+        hours.append(datetime.fromtimestamp(time, weather["meta"]["timezone"]).strftime('%H:%M'))
         temperatures.append(details["feels_like"])
         cloud_covers.append(details["cloud_cover"])
         precipitation_probabilities.append(details["precipitation_probability"])
@@ -34,7 +33,7 @@ def generate_weather_graph(weather: dict, location: str) -> str:
     generate_uv_plot(hours, uv_indices)
 
     plt.suptitle(f"Weather Forecast for {location.title()}", fontsize=16)
-    plt.figtext(0.5, 0.02, f"{datetime.now(ZoneInfo(weather['meta']['timezone'])).strftime('%d/%b/%Y')} | Open-Meteo", ha="center", fontsize=10, color="gray")
+    plt.figtext(0.5, 0.02, f"{datetime.now(weather['meta']['timezone']).strftime('%d/%b/%Y')} | Open-Meteo", ha="center", fontsize=10, color="gray")
     plt.tight_layout(rect=[0, 0.03, 1, 0.95])
     plt.savefig(filename, dpi=300)
     plt.close()
