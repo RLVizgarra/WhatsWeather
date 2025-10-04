@@ -3,7 +3,8 @@ import hmac
 import json
 import os
 import time
-from fastapi import FastAPI, HTTPException, Request
+from typing import Annotated
+from fastapi import FastAPI, HTTPException, Header, Request
 from fastapi.responses import PlainTextResponse
 
 import reformat, weather, whatsapp, graph, analytics
@@ -63,13 +64,16 @@ async def handle_whatsapp_webhook(req: Request):
 
     analytics.log(int(timestamp), sender, text)
     whatsapp.set_typing_indicator_and_as_read(id)
-    send_whatsapp_forecast(sender, text)
+    send_whatsapp_forecast(sender, text, os.getenv("API_AUTHORIZATION_KEY"))
 
     return {"detail": "Message processed"}
 
 @app.post("/whatsapp/send")
-def send_whatsapp_forecast(to: str, location: str):
+def send_whatsapp_forecast(to: str, location: str, authorization: Annotated[str, Header()]):
     print("Sending WhatsApp forecast...")
+    if authorization != os.getenv("API_AUTHORIZATION_KEY"):
+        raise HTTPException(status_code=403, detail="Invalid Authorization header value")
+
     coordinates = weather.fetch_coordinates(location)
 
     if not coordinates:
