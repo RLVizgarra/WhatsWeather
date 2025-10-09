@@ -1,0 +1,26 @@
+{
+    "forecast_title": {
+        "en": "*Weather Forecast for {{1}}*",
+        "es": "*Pronostico del Clima para {{1}}*"
+    },
+    "forecast_subtitle": {
+        "en": "Next 6-hour forecast:",
+        "es": "Pronostico a 6 horas:"
+    },
+    "forecast_footer": {
+        "en": [
+            "> Forecast provided by _Open-Meteo_",
+            "_Due to WhatsApp limitations, remember to send here any message before 24 hours passes from *your* previous message._",
+            "_If not done, you *will not* receive the next forecast updates before you send a message._"
+        ],
+        "es": [
+            "> Pronostico dado por _Open-Meteo_",
+            "_Debido a limitaciones de WhatsApp, recorda de enviar aca cualquier mensaje antes de que pasen 24 horas de *tu* mensaje previo._",
+            "_De lo contrario, *no recibiras* el proximo pronostico automatico antes de que mandes un mensaje._"
+        ]
+    },
+    "location_not_found": {
+        "en": "The '{{1}}' location was not found. Please try again with a different location.",
+        "es": "La ubicacion '{{1}}' no se encontro. Por favor prueba de nuevo contra ubicacion."
+    }
+}

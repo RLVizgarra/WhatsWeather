@@ -6,9 +6,10 @@ import time
 from fastapi import FastAPI, HTTPException, Header, Query, Request
 from fastapi.responses import PlainTextResponse
 
-import reformat, weather, whatsapp, graph, analytics
+import reformat, weather, whatsapp, graph, analytics, translations
 
 
+LANGUAGE = "en"
 app = FastAPI()
 seen_messages = []
 
@@ -86,7 +87,7 @@ def send_whatsapp_forecast(
 
     result = weather.fetch_coordinates(location)
     if result is None:
-        whatsapp.send_message(to, f"The '{location}' location was not found. Please try again with a different location.")
+        whatsapp.send_message(to, translations.retrieve_message("location_not_found", LANGUAGE).replace("{{1}}", location))
         raise HTTPException(status_code=404, detail="Location not found")
     
     location, coordinates = result
@@ -98,9 +99,11 @@ def send_whatsapp_forecast(
     weather_graph = graph.generate_weather_graph(weather_data, location)
 
     if auto:
+        forecast_footer = translations.retrieve_message("forecast_footer", LANGUAGE)
         message += "\n~-------------~\n"
-        message += "_Due to WhatsApp limitations, remember to send here any message before 24 hours passes from *your* previous message._\n"
-        message += "_If not done, you *will not* receive the next forecast updates before you send a message._"
+        message += forecast_footer[1]
+        message += "\n"
+        message += forecast_footer[2]
         message = message.strip()
     whatsapp.send_image_message(to, message, weather_graph)
     return {"detail": "Message sent"}

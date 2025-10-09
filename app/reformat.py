@@ -1,6 +1,10 @@
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
+import translations
+
+
+LANGUAGE = "en"
 
 WMO_TO_EMOJI = {
     (61, 63, 65): "🌧️",  # Rain
@@ -47,10 +51,13 @@ def format_weather_message(weather: dict, location: str) -> str:
     todays_emoji = convert_wmo_to_emoji(weather["daily"]["weather_code"])
     if todays_emoji is None: todays_emoji = convert_cloud_cover_to_emoji(weather["daily"]["cloud_cover"])
 
-    message = f"{todays_emoji} *Weather Forecast for {location.title()}*\n"
+    message = todays_emoji + " "
+    message += translations.retrieve_message("forecast_title", LANGUAGE).replace("{{1}}", location.title())
+    message += "\n"
     message += f"```{datetime.now(weather['meta']['timezone']).strftime('%d/%b/%Y')}```\n"
     message += "~-------------~\n"
-    message += "Next 6-hour forecast:\n"
+    message += translations.retrieve_message("forecast_subtitle", LANGUAGE)
+    message += "\n"
     for i, (time, details) in enumerate(weather.items()):
         if time == "daily" or time == "meta":
             continue
@@ -64,7 +71,7 @@ def format_weather_message(weather: dict, location: str) -> str:
         message += f"- {convert_feels_like_to_emoji(details['feels_like'])} | {round(details['feels_like'])} °C\n"
         message += f"- {convert_precipitation_probability_to_emoji(details['precipitation_probability'])} | {details['precipitation_probability']} %\n"
         message += f"- {convert_uv_index_to_emoji(details['uv_index'])} | {round(details['uv_index'])} UV\n\n"
-    message += "> Forecast provided by _Open-Meteo_"
+    message += translations.retrieve_message("forecast_footer", LANGUAGE)[0]
     return message.strip()
 
 # Convert the returned JSON data into a easier dictionary
