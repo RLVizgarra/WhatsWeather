@@ -8,7 +8,7 @@ hardcoded_locations = {
 }
 
 # Fetch coordinates from Open-Meteo API
-def fetch_coordinates(location: str) -> tuple[float, float] | None:
+def fetch_coordinates(location: str) -> tuple[str, tuple[float, float]] | None:
     print("Fetching coordinates...")
 
     if location.lower() in hardcoded_locations:
@@ -31,9 +31,10 @@ def fetch_coordinates(location: str) -> tuple[float, float] | None:
     if "results" not in data or len(data["results"]) == 0:
         return None
 
+    name = data["results"][0]["name"]
     latitude = data["results"][0]["latitude"]
     longitude = data["results"][0]["longitude"]
-    return latitude, longitude
+    return name, (latitude, longitude)
 
 # Fetch forecast data from Open-Meteo API
 def fetch_weather_data(latitude: float, longitude: float) -> dict:

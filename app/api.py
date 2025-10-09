@@ -84,12 +84,12 @@ def send_whatsapp_forecast(
     if authorization != os.getenv("API_AUTHORIZATION_KEY"):
         raise HTTPException(status_code=403, detail="Invalid Authorization header value")
 
-    coordinates = weather.fetch_coordinates(location)
-
-    if not coordinates:
+    result = weather.fetch_coordinates(location)
+    if result is None:
         whatsapp.send_message(to, f"The '{location}' location was not found. Please try again with a different location.")
         raise HTTPException(status_code=404, detail="Location not found")
     
+    location, coordinates = result
     analytics.log(int(time.time()), to, location, auto)
 
     weather_raw_data = weather.fetch_weather_data(*coordinates)
