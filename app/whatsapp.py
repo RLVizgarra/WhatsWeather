@@ -43,9 +43,9 @@ def set_typing_indicator_and_as_read(message_id: str) -> None:
     if response.status_code != 200:
         raise ValueError(f"Failed to set typing indicator and as read: {response.status_code}, {response.text}")
 
-# Upload media to WhatsApp servers
+# Upload image to WhatsApp servers
 def upload_image(file_path: str) -> str:
-    print("Uploading media to WhatsApp...")
+    print("Uploading image to WhatsApp...")
 
     url = f"https://graph.facebook.com/v22.0/{os.getenv('WHATSAPP_PHONE_NUMBER_ID')}/media"
     headers = {
@@ -61,13 +61,13 @@ def upload_image(file_path: str) -> str:
     response = requests.post(url, headers=headers, data=data, files=files)
 
     if response.status_code != 200:
-        raise ValueError(f"Failed to upload media: {response.status_code}, {response.text}")
+        raise ValueError(f"Failed to upload image: {response.status_code}, {response.text}")
 
     return response.json().get("id")
 
-# Whatsapp API call to send the forecast as a message
-def send_forecast(to: str, message: str, image_path: str) -> None:
-    print("Sending WhatsApp message...")
+# Whatsapp API call to send a message with image
+def send_image_message(to: str, message: str, image_path: str) -> None:
+    print("Sending WhatsApp message with image...")
 
     url = f"https://graph.facebook.com/v22.0/{os.getenv('WHATSAPP_PHONE_NUMBER_ID')}/messages"
     headers = {
@@ -88,9 +88,9 @@ def send_forecast(to: str, message: str, image_path: str) -> None:
     if response.status_code != 200:
         raise ValueError(f"Failed to send message: {response.status_code}, {response.text}")
     
-# Whatsapp API call to report location not found
-def send_location_not_found(to: str, location: str) -> None:
-    print("Sending location not found message...")
+# Whatsapp API call to send a message
+def send_message(to: str, message: str) -> None:
+    print("Sending WhatsApp message...")
 
     url = f"https://graph.facebook.com/v22.0/{os.getenv('WHATSAPP_PHONE_NUMBER_ID')}/messages"
     headers = {
@@ -100,7 +100,7 @@ def send_location_not_found(to: str, location: str) -> None:
         "messaging_product": "whatsapp",
         "to": to,
         "text": {
-            "body": f"The '{location}' location was not found. Please try again with a different location."
+            "body": message
         }
     }
 

@@ -84,7 +84,7 @@ def send_whatsapp_forecast(
     coordinates = weather.fetch_coordinates(location)
 
     if not coordinates:
-        whatsapp.send_location_not_found(to, location)
+        whatsapp.send_message(to, f"The '{location}' location was not found. Please try again with a different location.")
         raise HTTPException(status_code=404, detail="Location not found")
     
     weather_raw_data = weather.fetch_weather_data(*coordinates)
@@ -92,5 +92,5 @@ def send_whatsapp_forecast(
     message = reformat.format_weather_message(weather_data, location)
     weather_graph = graph.generate_weather_graph(weather_data, location)
 
-    whatsapp.send_forecast(to, message, weather_graph)
+    whatsapp.send_image_message(to, message, weather_graph)
     return {"detail": "Message sent"}
