@@ -64,10 +64,7 @@ def format_weather_message(weather: dict, location: str) -> str:
         message += f"- {convert_feels_like_to_emoji(details['feels_like'])} | {round(details['feels_like'])} °C\n"
         message += f"- {convert_precipitation_probability_to_emoji(details['precipitation_probability'])} | {details['precipitation_probability']} %\n"
         message += f"- {convert_uv_index_to_emoji(details['uv_index'])} | {round(details['uv_index'])} UV\n\n"
-    message += "> Forecast provided by _Open-Meteo_\n"
-    message += "~-------------~\n"
-    message += "_Due to WhatsApp limitations, remember to send here any message before 24 hours passes from *your* previous message._\n"
-    message += "_If not done, you *will not* receive the next forecast updates before you send a message._"
+    message += "> Forecast provided by _Open-Meteo_"
     return message.strip()
 
 # Convert the returned JSON data into a easier dictionary

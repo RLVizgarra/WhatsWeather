@@ -5,9 +5,9 @@ import os
 
 
 CSV_PATH = "../logs/analytics.csv"
-HEADER = ["date", "time", "phone", "location"]
+HEADER = ["date", "time", "phone", "location", "auto"]
 
-def log(timestamp: int, phone: str, location: str):
+def log(timestamp: int, phone: str, location: str, auto: bool):
     print("Logging weather request...")
 
     dt = datetime.fromtimestamp(timestamp, timezone.utc)
@@ -18,7 +18,7 @@ def log(timestamp: int, phone: str, location: str):
     location = location.title()
 
     exists = os.path.exists(CSV_PATH)
-    row = [date, time, phone, location]
+    row = [date, time, phone, location, auto]
     with open(CSV_PATH, mode="a", newline="", encoding="utf-8") as logs:
         writer = csv.writer(logs)
 

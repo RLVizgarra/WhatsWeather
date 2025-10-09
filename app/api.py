@@ -67,7 +67,7 @@ async def handle_whatsapp_webhook(
 
     analytics.log(int(timestamp), sender, text)
     whatsapp.set_typing_indicator_and_as_read(id)
-    send_whatsapp_forecast(sender, text, os.getenv("API_AUTHORIZATION_KEY"))
+    send_whatsapp_forecast(sender, text.title(), False, os.getenv("API_AUTHORIZATION_KEY"))
 
     return {"detail": "Message processed"}
 
@@ -75,8 +75,9 @@ async def handle_whatsapp_webhook(
 def send_whatsapp_forecast(
     to: str,
     location: str,
+    auto: bool = False,
     authorization: str = Header(...)):
-    
+
     print("Sending WhatsApp forecast...")
     if authorization != os.getenv("API_AUTHORIZATION_KEY"):
         raise HTTPException(status_code=403, detail="Invalid Authorization header value")
@@ -87,10 +88,17 @@ def send_whatsapp_forecast(
         whatsapp.send_message(to, f"The '{location}' location was not found. Please try again with a different location.")
         raise HTTPException(status_code=404, detail="Location not found")
     
+    analytics.log(int(time.time()), to, location, auto)
+
     weather_raw_data = weather.fetch_weather_data(*coordinates)
     weather_data = reformat.convert_weather_data(weather_raw_data)
     message = reformat.format_weather_message(weather_data, location)
     weather_graph = graph.generate_weather_graph(weather_data, location)
 
+    if auto:
+        message += "\n~-------------~\n"
+        message += "_Due to WhatsApp limitations, remember to send here any message before 24 hours passes from *your* previous message._\n"
+        message += "_If not done, you *will not* receive the next forecast updates before you send a message._"
+        message = message.strip()
     whatsapp.send_image_message(to, message, weather_graph)
     return {"detail": "Message sent"}
