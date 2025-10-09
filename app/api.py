@@ -63,9 +63,11 @@ async def handle_whatsapp_webhook(
         whatsapp.mark_message_read(id)
         raise HTTPException(status_code=400, detail="Message too old to process")
     
-    text = notification["text"]["body"]
 
-    analytics.log(int(timestamp), sender, text)
+
+    
+    text: str = notification["text"]["body"]
+
     whatsapp.set_typing_indicator_and_as_read(id)
     send_whatsapp_forecast(sender, text.title(), False, os.getenv("API_AUTHORIZATION_KEY"))
 
